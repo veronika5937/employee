@@ -4,3 +4,9 @@ export interface Employee {
     empActive: boolean;
     department: number;
 }
+
+export interface EmployeeRes {
+    data: Employee[];
+    totalCount: number;
+}
+

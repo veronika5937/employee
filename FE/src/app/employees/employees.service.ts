@@ -1,16 +1,19 @@
 import { Injectable } from '@angular/core';
-import { Employee } from './employee.interface';
+import { Employee, EmployeeRes } from './employee.interface';
 import { ActionTypeEnum, Department } from '../shared';
 import { BehaviorSubject, of } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 @Injectable()
 export class EmployeeService {
   constructor(private httpClient: HttpClient) { }
 
-  getEmployees() {
-    return this.httpClient.get<Employee[]>(`${environment.apiUrl}/employees`);
+  getEmployees(page: number, empName: string) {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('empName', empName);
+    return this.httpClient.get<EmployeeRes>(`${environment.apiUrl}/employees`, {params});
   }
 
   createEmployee(employee: Employee) {
@@ -29,23 +32,18 @@ export class EmployeeService {
     return this.httpClient.get<Department[]>(`${environment.apiUrl}/departments`);
   }
 
-  handleFilter(filterVal: string, employees: Employee[]) {
-    const pattern = new RegExp('^' + filterVal, 'i');
-    return employees.filter(({empName}) => empName.match(pattern));
-  }
-
-  handleData(employee: Employee, employees: Employee[], action: ActionTypeEnum) {
-    switch (action) {
-      case ActionTypeEnum.EDIT: {
-        return employees.map(emp => emp.id === employee.id ? employee : emp);
-      }
-      case ActionTypeEnum.REMOVE: {
-        return employees.filter(emp => emp.id !== employee.id);
-      }
-      case ActionTypeEnum.ADD: {
-        return [...employees, employee];
-      }
-    }
-  }
+  // handleData(employee: Employee, employees: Employee[], action: ActionTypeEnum) {
+  //   switch (action) {
+  //     case ActionTypeEnum.EDIT: {
+  //       return employees.map(emp => emp.id === employee.id ? employee : emp);
+  //     }
+  //     case ActionTypeEnum.REMOVE: {
+  //       return employees.filter(emp => emp.id !== employee.id);
+  //     }
+  //     case ActionTypeEnum.ADD: {
+  //       return [...employees, employee];
+  //     }
+  //   }
+  // }
 
 }

@@ -1,18 +1,16 @@
 <div class="employees-header">
     <button (click)="openForm()" mat-stroked-button color="primary">Create new employee</button>
 
-    <mat-form-field>
-        <input matInput placeholder="Employee name" #search (input)="filter(search.value)">
-    </mat-form-field>
+    <app-employees-filter></app-employees-filter>
 
     <mat-paginator [showFirstLastButtons]="true"
-                    [length]="(recommenderData$ | async)?.totalCount"
+                    [length]="(employees$ | async)?.totalCount"
                     [pageSize]="10">
     </mat-paginator>
 </div>
 
 <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource">
+    <table mat-table [dataSource]="(employees$ | async)?.data">
         <!-- ID Column -->
         <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef>empID</th>

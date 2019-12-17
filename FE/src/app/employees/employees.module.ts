@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { EmployeeService } from './employees.service';
+import { EmployeesFilterComponent } from './employees-filter';
 
 const material = [
   MatDialogModule,
@@ -24,7 +25,11 @@ const material = [
 ];
 
 @NgModule({
-  declarations: [EmployeesComponent, EmployeesFormComponent],
+  declarations: [
+    EmployeesComponent,
+    EmployeesFormComponent,
+    EmployeesFilterComponent
+  ],
   imports: [
     CommonModule,
     RouterModule.forChild([{path: '', component: EmployeesComponent}]),

@@ -1,12 +1,14 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { MatDialogConfig, MatDialog } from '@angular/material/dialog';
-import { Employee } from './employee.interface';
+import { Employee, EmployeeRes } from './employee.interface';
 import { EmployeesFormComponent } from './employees-form';
-import { take } from 'rxjs/operators';
-import { MatTableDataSource } from '@angular/material/table';
+import { take, switchMap, share } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { EmployeeService } from './employees.service';
-import { ActionTypeEnum, Department } from '../shared';
+import { Department } from '../shared';
+import { merge, BehaviorSubject, Observable } from 'rxjs';
+import { EmployeesFilterComponent } from './employees-filter';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-employees',
@@ -15,30 +17,28 @@ import { ActionTypeEnum, Department } from '../shared';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeesComponent implements OnInit {
-  employees: Employee[];
+  employees$: Observable<EmployeeRes>;
   departments: Department[];
   departmentNames: {[key: number]: string};
 
   displayedColumns: string[] = ['id', 'empName', 'empActive', 'department', 'controls'];
-  dataSource: MatTableDataSource<Employee>;
+  update$ = new BehaviorSubject(Symbol());
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(EmployeesFilterComponent, {static: true}) filterInput: EmployeesFilterComponent;
 
-  constructor(private dialog: MatDialog, private cd: ChangeDetectorRef, private employeeService: EmployeeService) { }
+  constructor(private dialog: MatDialog, private employeeService: EmployeeService, private toastrService: ToastrService) { }
 
   ngOnInit() {
-    this.employeeService.getDepartments().subscribe(dep => {
-      this.departments = dep;
-      this.departmentNames = this.departments.reduce((acc, currentVal) => {
-        acc[currentVal.id] = currentVal.dpName;
-        return acc;
-      }, {});
-    });
+    this.employeeService.getDepartments()
+      .subscribe(departments => this.handleDepartments(departments));
 
-    this.employeeService.getEmployees().subscribe(employees => {
-      this.employees = employees;
-      this.setTableData(employees);
-    });
+    this.filterInput.filterChange$.subscribe(() => this.paginator.pageIndex = 0);
+
+    this.employees$ = merge(this.update$, this.paginator.page, this.filterInput.filterChange$).pipe(
+      switchMap(() => this.employeeService.getEmployees(this.paginator.pageIndex, this.filterInput.value)),
+      share()
+    );
   }
 
   openForm(employee: Partial<Employee> = {}) {
@@ -49,29 +49,27 @@ export class EmployeesComponent implements OnInit {
 
     dialogRef.afterClosed()
       .pipe(take(1))
-      .subscribe(data => data && this.handleEmployees(data.action, data.employee));
+      .subscribe(data => data && this.handleEmployees());
   }
 
-  setTableData(employees: Employee[]) {
-    this.dataSource = new MatTableDataSource<Employee>(employees);
-    this.dataSource.paginator = this.paginator;
-    this.cd.markForCheck();
-  }
-
-  filter(value: string) {
-    const filterVal = value.trim();
-    const filteredData = filterVal ? this.employeeService.handleFilter(filterVal, this.employees) : this.employees;
-    this.setTableData(filteredData);
-  }
 
   delete(employee: Employee) {
     this.employeeService.deleteEmployee(employee.id)
-      .subscribe(() => this.handleEmployees(ActionTypeEnum.REMOVE, employee));
+      .subscribe(() => this.handleEmployees());
   }
 
-  private handleEmployees(action: ActionTypeEnum, employee: Employee) {
-    this.employees = this.employeeService.handleData(employee, this.employees, action);
-    this.setTableData(this.employees);
+  private handleEmployees() {
+    this.toastrService.success('Employees has been successfully changed');
+    this.update$.next(Symbol());
   }
+
+  private handleDepartments(dep: Department[]) {
+    this.departments = dep;
+    this.departmentNames = this.departments.reduce((acc, currentVal) => {
+      acc[currentVal.id] = currentVal.dpName;
+      return acc;
+    }, {});
+  }
+
 
 }
