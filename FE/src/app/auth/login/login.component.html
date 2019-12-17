@@ -1,0 +1,27 @@
+<form  [formGroup]="loginForm" novalidate (ngSubmit)="onSubmit(loginForm.value)" class="auth-form">
+    <mat-form-field>
+        <input matInput placeholder="Email" formControlName="email" required>
+        <mat-error *ngIf="loginForm.get('email').errors as err">
+            <div  *ngIf="err.required">Email is <strong>required</strong></div>
+            <div  *ngIf="err.pattern">Email is <strong>invalid</strong></div>
+        </mat-error>
+        
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput placeholder="Password" [type]="hide ? 'password' : 'text'" formControlName="password" required>
+
+        <mat-icon  matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+            {{hide ? 'visibility_off' : 'visibility'}}
+        </mat-icon>
+
+        <mat-error *ngIf="loginForm.get('password').errors as err">
+            <div *ngIf="err.required">Password is <strong>required</strong></div>
+        </mat-error>
+    </mat-form-field>
+
+    <button  type="submit" [disabled]="loginForm.invalid" mat-raised-button color="primary">
+        Login
+    </button>
+</form>
+

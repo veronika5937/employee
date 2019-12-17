@@ -1,0 +1,11 @@
+.employees {
+    &-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &-btn + &-btn {
+        margin-left: 16px;
+    }
+}

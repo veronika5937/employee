@@ -1,0 +1,10 @@
+<header class="app-header">
+    <h1 class="app-header-title">
+        <i class="material-icons app-header-title__icon">accessibility_new</i>
+        EmployeeApp
+    </h1>
+
+    <button class="app-header-btn" (click)="logOut()" *ngIf="userToken$ | async">
+        <i class="material-icons">exit_to_app</i> LogOut
+    </button>
+</header>

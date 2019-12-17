@@ -1,0 +1,16 @@
+.employees-form {
+    min-width: 50vw;
+    display: flex;
+    flex-direction: column;
+    
+    &__wrapper {
+        justify-content: center;
+    }
+    &__title {
+        text-align: center;
+    }
+}
+
+mat-slide-toggle {
+    padding-top: 16px;
+}

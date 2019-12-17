@@ -1,0 +1,34 @@
+<h2 mat-dialog-title class="employees-form__title">{{ editMode ?  'Edit ' + employee.name : 'Create new employee' }}</h2>
+
+<form [formGroup]="employeeForm" novalidate (ngSubmit)="onSubmit(employeeForm.value)">
+
+    <mat-dialog-content class="employees-form">
+        <mat-form-field>
+            <input matInput placeholder="empName" formControlName="empName" required>
+            <mat-error *ngIf="employeeForm.get('empName').errors">
+                empName is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="empActive">empActive</mat-slide-toggle>
+
+        <mat-form-field>
+            <mat-select placeholder="empDepartment" formControlName="department" required>
+                <mat-option *ngFor="let option of data.departments" [value]="option.id">
+                    {{option.dpName}}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="employeeForm.get('department').errors">
+                empDepartment is <strong>required</strong>
+            </mat-error>
+        </mat-form-field>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="employees-form__wrapper">
+        <button  type="submit" [disabled]="employeeForm.invalid || employeeForm.pristine" mat-raised-button color="primary">
+            {{editMode ? 'Edit' : 'Create'}}
+        </button>
+        <button mat-dialog-close mat-stroked-button color="primary">Close</button>
+    </mat-dialog-actions>
+
+</form>
