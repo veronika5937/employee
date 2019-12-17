@@ -3,7 +3,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { EmployeeRepository } from './employee.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from './employee.entity';
-import { User } from '../auth/user.entity';
+import { GetTasksFilterDto } from './dto/get-employees-filter.dto';
 
 @Injectable()
 export class EmployeeService {
@@ -12,8 +12,8 @@ export class EmployeeService {
     private employeeRepository: EmployeeRepository,
   ) {}
 
-  async getEmployees(): Promise<Employee[]> {
-    return this.employeeRepository.getEmployees();
+  async getEmployees(filterDto: GetTasksFilterDto): Promise<Employee[]> {
+    return this.employeeRepository.getEmployees(filterDto);
   }
 
   async getEmployeeById(id: number): Promise<Employee> {

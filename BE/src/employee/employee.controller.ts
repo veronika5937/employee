@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Param, Delete, Patch, Query, UsePipes, ValidationPipe, ParseIntPipe, UseGuards, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query, UsePipes, ValidationPipe, ParseIntPipe, UseGuards, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { Employee } from './employee.entity';
-import { User } from '../auth/user.entity';
+import { GetTasksFilterDto } from './dto/get-employees-filter.dto';
 
 @Controller('employees')
 @UseGuards(AuthGuard())
@@ -12,8 +12,8 @@ export class EmployeeController {
   constructor(private employeeService: EmployeeService) {}
 
   @Get()
-  getEmployees(): Promise<Employee[]> {
-    return this.employeeService.getEmployees();
+  getEmployees(@Query(ValidationPipe) filterDto: GetTasksFilterDto): Promise<Employee[]> {
+    return this.employeeService.getEmployees(filterDto);
   }
 
   @Get('/:id')
